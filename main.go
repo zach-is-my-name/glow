@@ -296,6 +296,11 @@ func executeCLI(cmd *cobra.Command, src *source, w io.Writer) error {
 
 	isCode := !utils.IsMarkdownFile(src.URL)
 
+	// Debug: Always print this to see if we're in the right place
+	if os.Getenv("GLOW_DEBUG") != "" {
+		fmt.Fprintf(os.Stderr, "RENDER FUNCTION: width=%d\n", width)
+	}
+	
 	// initialize glamour
 	glamourOptions := []glamour.TermRendererOption{
 		glamour.WithColorProfile(lipgloss.ColorProfile()),
@@ -306,17 +311,58 @@ func executeCLI(cmd *cobra.Command, src *source, w io.Writer) error {
 	}
 	
 	// Handle zen-mode margins
+	if os.Getenv("GLOW_DEBUG") != "" {
+		fmt.Fprintf(os.Stderr, "ZEN-MODE CHECK: zenMode=%v\n", zenMode)
+	}
 	if zenMode {
-		// Zen mode: centered column with clean margins (like VSCode/Neovim zen-mode)
-		// Use configurable margin percentage for comfortable zen reading
-		autoMargin := width * zenMarginPercent / 100
-		if autoMargin < 10 {
-			autoMargin = 10  // Minimum margin for readability
+		// Zen mode: comfortable reading width centered in terminal (like VSCode/Neovim zen-mode)
+		var contentWidth uint
+		var totalMargin uint
+		
+		if zenWidth > 0 {
+			// User specified exact content width
+			contentWidth = zenWidth
+		} else {
+			// Auto: comfortable reading width based on terminal size
+			// Aim for 65-80 characters for optimal readability
+			if width <= 100 {
+				contentWidth = width * 80 / 100  // 80% of small terminals
+			} else {
+				contentWidth = 80  // Fixed 80 chars for large terminals
+			}
 		}
-		if autoMargin > 50 {
-			autoMargin = 50  // Cap for very large margins
+		
+		// Calculate margins to center the content
+		if contentWidth < width {
+			totalMargin = width - contentWidth
+			autoMargin := totalMargin / 2
+			
+			// Debug zen-mode values
+			if os.Getenv("GLOW_DEBUG") != "" {
+				fmt.Fprintf(os.Stderr, "GLOW ZEN-MODE: terminal=%d, contentWidth=%d, autoMargin=%d\n", width, contentWidth, autoMargin)
+			}
+			
+			// Keep the width coordination that worked, but use WithMargins for consistency
+			// Use glamour's existing center alignment - was working perfectly!
+			glamourOptions = []glamour.TermRendererOption{
+				glamour.WithColorProfile(lipgloss.ColorProfile()),
+				utils.GlamourStyle(style, isCode),
+				glamour.WithWordWrap(int(width)), // Use terminal width
+				glamour.WithBaseURL(baseURL),
+				glamour.WithPreservedNewLines(),
+				glamour.WithCenterAlignment(autoMargin, autoMargin), // Back to what worked!
+			}
+		} else {
+			// Content width >= terminal width, fallback to percentage margins
+			autoMargin := width * zenMarginPercent / 100
+			if autoMargin < 10 {
+				autoMargin = 10
+			}
+			if autoMargin > 50 {
+				autoMargin = 50
+			}
+			glamourOptions = append(glamourOptions, glamour.WithMargins(autoMargin, autoMargin))
 		}
-		glamourOptions = append(glamourOptions, glamour.WithMargins(autoMargin, autoMargin))
 	}
 
 	r, err := glamour.NewTermRenderer(glamourOptions...)

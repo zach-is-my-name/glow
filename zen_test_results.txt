@@ -1,0 +1,212 @@
+
+              # Comprehensive Zen-Mode Test for All Markdown Elements             
+                                                                                  
+  This document tests all markdown rendering elements to ensure consistent zen-mode
+   width handling at approximately 80 characters with proper centering and margin 
+  calculations.                                                                   
+                                                                                  
+                                                                                  
+                        ## Paragraphs - Basic Text Wrapping                       
+                                                                                  
+      This is a long paragraph that should wrap naturally at approximately 80     
+     characters without breaking words awkwardly in the middle of sentences or    
+   creating uncomfortable reading experiences. The text should flow smoothly and  
+  maintain readability while respecting the zen-mode width constraints and margin 
+  settings.                                                                       
+                                                                                  
+                                                                                  
+    Another paragraph with different content to test consistency. This paragraph  
+  contains various punctuation marks, numbers like 12345, and should maintain the 
+   same wrapping behavior as the previous paragraph while demonstrating that zen- 
+  mode works across multiple text blocks.                                         
+                                                                                  
+                                                                                  
+                          ## Headings - All Levels (H1-H6)                        
+                                                                                  
+     ### This is a longer H3 heading that might wrap and needs to be tested for   
+   proper zen-mode width handling across different heading levels and should flow 
+                                     naturally                                    
+                                                                                  
+       #### This H4 heading also contains substantial text content that could     
+  potentially wrap depending on the width calculations and margin settings applied
+                                    in zen-mode                                   
+                                                                                  
+   ##### Even H5 headings with extensive text content need to be tested to ensure 
+       they respect the zen-mode width constraints and don't break awkwardly      
+                                                                                  
+    ###### Finally, H6 headings with long descriptive text should also maintain   
+   consistent behavior with the established zen-mode width and margin parameters  
+                                                                                  
+                    ## Lists - Bullet Points and Numbered Lists                   
+                                                                                  
+                                                                                  
+                    • This is a bullet point with enough text to                  
+                            test wrapping behavior and ensure it                  
+                              flows naturally without breaking                    
+                            every few words or creating awkward                   
+                                line breaks in the middle of                      
+                                     important concepts                           
+                      • Another bullet with even more text to                     
+                              really stress test the wrapping                     
+                             algorithm and margin calculations                    
+                            used in zen-mode rendering to ensure                  
+                                        consistency                               
+                    • A third bullet point that includes various                  
+                               elements like numbers 123456,                      
+                               punctuation marks, and should                      
+                             maintain proper indentation while                    
+                                  respecting width limits                         
+                                                                                  
+                       • Nested bullet point that should also                     
+                          respect zen-mode width settings                         
+                              while maintaining proper                            
+                             indentation hierarchy and                            
+                                    readability                                   
+                     • Another nested item for thorough testing                   
+                            of nested list rendering and                          
+                           width calculations in zen-mode                         
+                     • Third nested item to ensure consistency                    
+                           across multiple nested levels                          
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                     1. Numbered list item with sufficient text                   
+                               to test ordered list wrapping                      
+                                behavior and ensure that the                      
+                              numbering doesn't interfere with                    
+                                 proper width calculations                        
+                    2. Second numbered item with extensive text                   
+                            content for validation of consistent                  
+                            rendering across different list item                  
+                                numbers and content lengths                       
+                        3. Third item that includes special                       
+                            characters, punctuation, and longer                   
+                               phrases to test edge cases in                      
+                               ordered list rendering within                      
+                                    zen-mode constraints                          
+                                                                                  
+                    1. Nested numbered item to test hierarchical                  
+                           numbering with zen-mode width                          
+                                    constraints                                   
+                        2. Another nested numbered item for                       
+                               comprehensive testing                              
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                       ## Code Blocks - Inline and Block Code                     
+                                                                                  
+  Here's some inline code that should not wrap awkwardly.                         
+                                                                                  
+                                                                                  
+  // This is a code block with a long comment that should not wrap awkwardly in   
+  the middle                                                                      
+    const veryLongVariableName = someFunction(parameter1, parameter2, parameter3);
+  wsURL.searchParams.set('utterance_end_ms', '7000'); // Should not break mid-line
+  const anotherLongLine = 'This string contains a lot of text that might cause    
+  wrapping issues';                                                               
+                                                                                  
+    function exampleFunction(param1, param2, param3) {                            
+        // Long comments should be handled properly without awkward breaks        
+        return param1 + param2 + param3;                                          
+    }                                                                             
+                                                                                  
+    # Shell commands with long paths and parameters                               
+    cd /very/long/path/to/some/directory/that/might/cause/wrapping/issues         
+    ./glow-fixed -z test_comprehensive_zen.md | tee zen_output.txt                
+                                                                                  
+                           ## Tables - Simple and Complex                         
+                                                                                  
+   Column 1 Header | Column 2 Header with More Text  | Column 3 Extended Header   
+  -----------------|---------------------------------|--------------------------  
+   Short content   | This is longer content that     | Even longer content here   
+                   | might wrap                      |                            
+   Another row     | With substantial text content   | Final column content       
+                   | that tests table rendering      |                            
+                                                                                  
+                        ## Block Quotes - Nested and Simple                       
+                                                                                  
+  | This is a block quote with substantial text content that needs to wrap properly
+  | at zen-mode widths without creating awkward line breaks in the middle of      
+  | important concepts or philosophical statements.                               
+  |                                                                               
+                                                                                  
+  | This is another block quote to test consistency across multiple quote blocks  
+  and                                                                             
+  | ensure that the zen-mode rendering handles them uniformly.                    
+  |                                                                               
+  |                                                                               
+  | | This is a nested block quote that should also respect zen-mode width settings
+  | | while maintaining proper indentation hierarchy for nested quotations.       
+  | |                                                                             
+                                                                                  
+                        ## Links and URLs - Various Formats                       
+                                                                                  
+         This paragraph contains a long URL like https://very-long-domain-        
+     name.example.com/path/to/resource/with/many/segments and should handle it    
+  properly without breaking the flow.                                             
+                                                                                  
+                                                                                  
+         Here's a long link with descriptive text that spans multiple words       
+  https://example.com that should be rendered correctly.                          
+                                                                                  
+                                                                                  
+   Reference-style links are also important: link with extensive description text 
+  https://another-very-long-domain-name.example.com/path/to/another/resource      
+                                                                                  
+                                                                                  
+                      ## Task Lists - Completed and Incomplete                    
+                                                                                  
+                                                                                  
+                     [ ] Incomplete task with long description                    
+                               that should wrap naturally at                      
+                              zen-mode width without breaking                     
+                              awkwardly in the middle of task                     
+                                        descriptions                              
+                     [x] Completed task with extensive text for                   
+                             testing purposes and validation of                   
+                               checkbox rendering in zen-mode                     
+                       [ ] Another incomplete task to ensure                      
+                              consistency across multiple task                    
+  list items                                                                      
+                                                                                  
+                                                                                  
+                                                                                  
+              ## Emphasis and Formatting - Bold, Italic, Strikethrough            
+                                                                                  
+    This paragraph contains **bold text with longer content that spans multiple   
+     words** and *italic text that also spans multiple words* to test emphasis    
+  rendering in zen-mode.                                                          
+                                                                                  
+                                                                                  
+    Here's some ~~strikethrough text with substantial content~~ and *bold italic  
+  combination text* for comprehensive testing.                                    
+                                                                                  
+                                                                                  
+                                ## Horizontal Rules                               
+                                                                                  
+  --------                                                                        
+                                                                                  
+                           ## Images and Alternative Text                         
+                                                                                  
+   Image: This is a long alternative text description for an image that should be 
+      handled properly in zen-mode rendering without creating awkward breaks →    
+  /Users/zm/Scratch/glow/example.png                                              
+                                                                                  
+                                                                                  
+                             ## Mixed Content Paragraph                           
+                                                                                  
+   This final paragraph combines multiple elements: **bold text**, *italic text*, 
+   inline code, a link https://example.com, and various punctuation marks to test 
+  how zen-mode handles complex content mixing different markdown elements within a
+  single paragraph block.                                                         
+                                                                                  
+
