@@ -399,7 +399,20 @@ func executeCLI(cmd *cobra.Command, src *source, w io.Writer) error {
 	}
 
 	if pager {
-		cmd := exec.Command("less", "-R")
+		pagerCmd := os.Getenv("PAGER")
+		if pagerCmd == "" {
+			pagerCmd = "less -R"
+		}
+		
+		// Split pager command to handle arguments
+		parts := strings.Fields(pagerCmd)
+		var cmd *exec.Cmd
+		if len(parts) > 1 {
+			cmd = exec.Command(parts[0], parts[1:]...)
+		} else {
+			cmd = exec.Command(parts[0])
+		}
+		
 		cmd.Stdin = strings.NewReader(out)
 		cmd.Stdout = os.Stdout
 		if err := cmd.Run(); err != nil {
