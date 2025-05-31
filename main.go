@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/caarlos0/env/v11"
@@ -45,6 +46,8 @@ var (
 	zenMode          bool
 	zenWidth         uint
 	zenMarginPercent uint
+	zenMarginChars   uint
+	zenValue         string // Custom zen flag that accepts optional value
 
 	rootCmd = &cobra.Command{
 		Use:   "glow [SOURCE|DIR]",
@@ -173,9 +176,20 @@ func validateOptions(cmd *cobra.Command) error {
 	tui = viper.GetBool("tui")
 	showAllFiles = viper.GetBool("all")
 	preserveNewLines = viper.GetBool("preserveNewLines")
-	zenMode = viper.GetBool("zenMode")
+	zenValue = viper.GetString("zenValue")
 	zenWidth = viper.GetUint("zenWidth")
 	zenMarginPercent = viper.GetUint("zenMarginPercent")
+	zenMarginChars = viper.GetUint("zenMarginChars")
+	
+	// Parse zen flag: empty string = not set, "true" = -z with no value, number = -z=N
+	if zenValue != "" {
+		zenMode = true
+		if zenValue != "true" { // If it's not just a boolean flag
+			if parsed, err := strconv.ParseUint(zenValue, 10, 32); err == nil {
+				zenMarginChars = uint(parsed) // Override with parsed value
+			}
+		}
+	}
 
 	// Apply zen-mode width settings (after all viper values are read)
 	if zenMode {
@@ -332,36 +346,39 @@ func executeCLI(cmd *cobra.Command, src *source, w io.Writer) error {
 			}
 		}
 		
-		// Calculate margins to center the content
-		if contentWidth < width {
+		// Calculate margins
+		var autoMargin uint
+		if zenMarginChars > 0 {
+			// Use fixed character margin if specified
+			autoMargin = zenMarginChars
+		} else if contentWidth < width {
+			// Auto-calculate margins to center the content
 			totalMargin = width - contentWidth
-			autoMargin := totalMargin / 2
-			
-			// Debug zen-mode values
-			if os.Getenv("GLOW_DEBUG") != "" {
-				fmt.Fprintf(os.Stderr, "GLOW ZEN-MODE: terminal=%d, contentWidth=%d, autoMargin=%d\n", width, contentWidth, autoMargin)
-			}
-			
-			// Keep the width coordination that worked, but use WithMargins for consistency
-			// Use glamour's existing center alignment - was working perfectly!
-			glamourOptions = []glamour.TermRendererOption{
-				glamour.WithColorProfile(lipgloss.ColorProfile()),
-				utils.GlamourStyle(style, isCode),
-				glamour.WithWordWrap(int(width)), // Use terminal width
-				glamour.WithBaseURL(baseURL),
-				glamour.WithPreservedNewLines(),
-				glamour.WithCenterAlignment(autoMargin, autoMargin), // Back to what worked!
-			}
+			autoMargin = totalMargin / 2
 		} else {
 			// Content width >= terminal width, fallback to percentage margins
-			autoMargin := width * zenMarginPercent / 100
+			autoMargin = width * zenMarginPercent / 100
 			if autoMargin < 10 {
 				autoMargin = 10
 			}
 			if autoMargin > 50 {
 				autoMargin = 50
 			}
-			glamourOptions = append(glamourOptions, glamour.WithMargins(autoMargin, autoMargin))
+		}
+		
+		// Debug zen-mode values
+		if os.Getenv("GLOW_DEBUG") != "" {
+			fmt.Fprintf(os.Stderr, "GLOW ZEN-MODE: terminal=%d, contentWidth=%d, autoMargin=%d, fixedChars=%d\n", width, contentWidth, autoMargin, zenMarginChars)
+		}
+		
+		// Use glamour's native Document margin system for clean zen-mode
+		glamourOptions = []glamour.TermRendererOption{
+			glamour.WithColorProfile(lipgloss.ColorProfile()),
+			utils.GlamourStyle(style, isCode),
+			glamour.WithWordWrap(int(width)), 
+			glamour.WithBaseURL(baseURL),
+			glamour.WithPreservedNewLines(),
+			glamour.WithZenMode(autoMargin), // Native Document margin system
 		}
 	}
 
@@ -444,9 +461,11 @@ func init() {
 	rootCmd.Flags().BoolVarP(&showLineNumbers, "line-numbers", "l", false, "show line numbers (TUI-mode only)")
 	rootCmd.Flags().BoolVarP(&preserveNewLines, "preserve-new-lines", "n", false, "preserve newlines in the output")
 	rootCmd.Flags().BoolVarP(&mouse, "mouse", "m", false, "enable mouse wheel (TUI-mode only)")
-	rootCmd.Flags().BoolVarP(&zenMode, "zen", "z", false, "zen-mode reading with justified text and auto margins (overrides other alignment settings)")
+	_ = rootCmd.Flags().StringP("zen", "z", "", "zen-mode reading with auto margins, or -z=N for N-character margins")
+	rootCmd.Flags().Lookup("zen").NoOptDefVal = "true" // Allow -z without value
 	rootCmd.Flags().UintVar(&zenWidth, "zen-width", 0, "line width for zen-mode (0 = auto based on terminal)")
 	rootCmd.Flags().UintVar(&zenMarginPercent, "zen-margin", 20, "margin percentage for zen-mode (e.g., 20 = 20% margins on each side)")
+	rootCmd.Flags().UintVar(&zenMarginChars, "zen-margin-chars", 0, "fixed character margin for zen-mode (0 = auto calculation, overrides zen-margin)")
 	_ = rootCmd.Flags().MarkHidden("mouse")
 
 	// Config bindings
@@ -459,9 +478,10 @@ func init() {
 	_ = viper.BindPFlag("preserveNewLines", rootCmd.Flags().Lookup("preserve-new-lines"))
 	_ = viper.BindPFlag("showLineNumbers", rootCmd.Flags().Lookup("line-numbers"))
 	_ = viper.BindPFlag("all", rootCmd.Flags().Lookup("all"))
-	_ = viper.BindPFlag("zenMode", rootCmd.Flags().Lookup("zen"))
+	_ = viper.BindPFlag("zenValue", rootCmd.Flags().Lookup("zen"))
 	_ = viper.BindPFlag("zenWidth", rootCmd.Flags().Lookup("zen-width"))
 	_ = viper.BindPFlag("zenMarginPercent", rootCmd.Flags().Lookup("zen-margin"))
+	_ = viper.BindPFlag("zenMarginChars", rootCmd.Flags().Lookup("zen-margin-chars"))
 
 	viper.SetDefault("style", styles.AutoStyle)
 	viper.SetDefault("width", 0)
